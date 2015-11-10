@@ -4,6 +4,8 @@ It's a starter "theme" for writing Javascript for your project,
 it's partially written in ES6 (use babel to compile into ES5)
 Please use grunt to compile, minimize and uglify.
 
+(Scroll Controller uses the Observer pattern)
+
 
 Grunt snippets:
 

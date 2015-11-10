@@ -1,12 +1,15 @@
 /* 
 *   SCROLL Listener App 
 */
-/* Created Modules will be passed with setModule(obj), you don't need to change any code in this file (ideal situation)  */
+/* Scroll Observer will be passed with subscribe(obj), you don't need to change any code in this file (ideal situation)  */
 /* 
 * example how to use it:
 * Manager.ScrollController = new App.ScrollController();                --- (in common)
-* Manager.ScrollController.setModule(new MyModules.fadeInBlocks());     --- (in common or page specific)
+* Manager.ScrollController.subscribe(new MyModules.fadeInBlocks());     --- (in common or page specific)
 * Manager.ScrollController.finalize();                                  --- (to add the listener)
+*
+*   the fire function calls the objects initialize function "init" needed for all subscribers and
+*   passes in scroll information
 */
 
 (function($, App) {
@@ -24,11 +27,22 @@
             scrollDirection : "down"
         };
 
-        // function name array of function strings
-        this.arrFn = [];
+        // functions array of the observer
+        this.arrHandlers = [];
 
-        //#### you need to call that function to set the Module Obj that has an init function!!!!!!!
-        this.setModule = (fnName) => {  this.arrFn.push(fnName); }
+        //#### subscribe to the scroll event
+        this.subscribe = (obj) => {  this.arrHandlers.push(obj); }
+
+
+        this.unsubscribe = (obj) => {
+
+            this.arrHandlers = this.arrHandlers.filter( (item) => {
+                    if (item !== obj) {
+                        return item;
+                    }
+                }
+            );
+        },
 
      
         this.callScrollListener = function() {
@@ -36,9 +50,8 @@
             // on resize or on initalize reset
             this.vars.windowHeight = window.innerHeight;
 
-            // the functions that need to be called + initialize elements.
-            // true to do the resets
-            self.callFunctions(true);            
+            // notify the observer on page load or when resized
+            self.fire(true);            
 
             $(window).off("scroll");
 
@@ -51,23 +64,26 @@
 
                 self.vars.lastScrollTop = self.vars.scrollTop;
                 
-                self.callFunctions(false);
-             
+                // notify the observer on scroll
+                self.fire(false);
             });
         };
-   
-      
 
-        this.callFunctions = function(reset) {
-   
-            if (self.arrFn instanceof Array) {
-           
-                self.arrFn.map( fn => fn.init(self.vars, reset) );
+
+        this.fire = function(reset) {
+
+            if (self.arrHandlers instanceof Array) {
+
+                this.arrHandlers.forEach( (item) => {
+
+                    item.init.call(item, self.vars, reset);
+                });
             }
-        }
+        };
+   
+    
 
-
-        // when all the scroll event listener functions are set
+        // when all the observer are set (global and page specific)
         this.finalize = () => {
 
             if ($(window).width() > 1024) {
@@ -82,8 +98,7 @@
         }
 
 
-        this.myDebouncedFunc = debounce(() => { self.callScrollListener() });
-
+        this.myDebouncedFunc = debounce(() => { self.callScrollListener() }, 200);
     }
 
 

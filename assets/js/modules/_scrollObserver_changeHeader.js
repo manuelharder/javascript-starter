@@ -3,9 +3,9 @@
 (function() {
 
 
-    MyModules.Scroll_ChangeHeader = function() {
+    MyModules.ScrollObserver_ChangeHeader = function() {
         
-        let self = this;
+        var self = this;
 
         this.header = {};
 

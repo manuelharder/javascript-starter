@@ -22,7 +22,7 @@
 
                 Manager.ScrollController = new App.ScrollController();
                 
-                Manager.ScrollController.setModule(new MyModules.Scroll_FadeInBlocks());
+                Manager.ScrollController.subscribe(new MyModules.ScrollObserver_FadeInBlocks());
             },
             // calls event listener or other elements, when common and the page specific stuff is handled
             finalize: function() {
@@ -36,8 +36,8 @@
         home: {
             init: function() {
 
-                Manager.ScrollController.setModule(new MyModules.Scroll_ChangeHeader());  
-
+                Manager.ScrollController.subscribe(new MyModules.ScrollObserver_ChangeHeader());  
+                
                 Manager.GoogleMaps = new App.GoogleMapsController();            
             }
         }
